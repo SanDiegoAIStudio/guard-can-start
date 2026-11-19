@@ -180,7 +180,7 @@ They need `sh`, `bash`, `zsh`, Python 3.9 or newer, and the tools the checker it
 `python3 tests/mutate.py` plants one bug at a time in a copy of the checker and runs the tests against each one, which took about seven minutes on the Mac it was tested on. It counts a bug as caught only when a test fails on an assertion. A real run ends with:
 
 ```
-caught 57 of 57
+caught 58 of 58
 ```
 
 The run exits 0 when every planted bug is caught. It exits 1 when the caught count is short of the total. It exits 2 when a planted edit is not in the checker exactly once or changes nothing, or when the edited script fails `/bin/sh -n` (and `/bin/dash -n` when `/bin/dash` exists).
@@ -193,7 +193,7 @@ The same author also publishes [harness-guard](https://github.com/LucasCooperBey
 
 ## Limits
 
-The checker runs your guard for real on the two inputs, so both must be files that are safe to feed it. A guard that fails for another reason with an ordinary exit code still reads as a refusal unless `--refuse-code` or `--good` catches it, which is why the `it said` line is shown. An exit above 128 is read as the guard having been ended by a signal. The parse check covers sh, bash, zsh, ksh, Python 3 and JavaScript. It runs the parser of that name found on your PATH (`python3` for Python, `node` for JavaScript), so a guard is judged by the versions installed where the check runs. A first line that names `python2` is not parse-checked, and neither is a compiled guard. A guard called any other way than a path as its first argument, or the input on standard input, needs a two-line wrapper:
+The checker runs your guard for real on the two inputs, so both must be files that are safe to feed it. A guard that fails for another reason with an ordinary exit code still reads as a refusal unless `--refuse-code` or `--good` catches it, which is why the `it said` line is shown. An exit above 128 is read as the guard having been ended by a signal. With `--refuse-code` set to 126, 127 or a number above 128, an exit with that number reads as the refusal, although the shell uses those numbers for a guard that could not start or that a signal ended. The parse check covers sh, bash, zsh, ksh, Python 3 and JavaScript. It runs the parser of that name found on your PATH (`python3` for Python, `node` for JavaScript), so a guard is judged by the versions installed where the check runs. A first line that names `python2` is not parse-checked, and neither is a compiled guard. A guard called any other way than a path as its first argument, or the input on standard input, needs a two-line wrapper:
 
 ```
 #!/bin/sh

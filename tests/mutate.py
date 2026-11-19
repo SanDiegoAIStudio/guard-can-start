@@ -64,6 +64,7 @@ MUTATIONS = [
         '  [ "$cg_status" -eq 0 ] && { fail_run "SAID YES TO KNOWN-BAD INPUT: $cg_guard" "$cg_bad_out" || return 1; }\n',
     ),
     ("parse_limit_one", "cg_parse_limit=5", "cg_parse_limit=1"),
+    ("parse_limit_six", "cg_parse_limit=5", "cg_parse_limit=6"),
     ("shebang_ignored", '[ "$cg_shebang" -eq 1 ]', '[ "$cg_shebang" -eq 9 ]'),
     (
         "extension_ignored",

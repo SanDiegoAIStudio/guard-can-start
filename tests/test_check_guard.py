@@ -128,9 +128,47 @@ class CheckGuardTest(unittest.TestCase):
         self.assertEqual(err, "")
         self.assertEqual(code, 1)
         self.assertIn("DOES NOT PARSE: g.sh", out)
+        parser = subprocess.run(
+            ["sh", "-n", "./g.sh"],
+            cwd=self.tmp,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            universal_newlines=True,
+        )
+        parser_lines = parser.stdout.splitlines()
+        self.assertGreater(len(parser_lines), 0)
         indented = [line for line in out.splitlines() if line.startswith("  ")]
-        self.assertGreaterEqual(len(indented), 2)
-        self.assertLessEqual(len(indented), 5)
+        self.assertEqual(indented, ["  " + line for line in parser_lines[:5]])
+
+    def test_parse_message_shows_the_first_five_lines(self):
+        """source: the checker shows the first five lines of a long parser message and no more."""
+        self.write_standin(
+            "sh",
+            "#!/bin/sh\n"
+            "if [ \"$1\" = \"-n\" ]; then\n"
+            "  printf '%s\\n' 'parse line 1' 'parse line 2' 'parse line 3' 'parse line 4' 'parse line 5' 'parse line 6' 'parse line 7' >&2\n"
+            "  exit 2\n"
+            "fi\n"
+            "exec /bin/sh \"$@\"\n",
+        )
+        self.write("g.sh", "#!/bin/sh\necho ok\n")
+        self.write("bad.txt", "x\n", executable=False)
+        code, out, err = self.run_check(["g.sh", "bad.txt"], env=self.prepend_bindir())
+        self.assertEqual(err, "")
+        self.assertEqual(code, 1)
+        self.assertIn("DOES NOT PARSE: g.sh", out)
+        indented = [line for line in out.splitlines() if line.startswith("  ")]
+        self.assertEqual(
+            indented,
+            [
+                "  parse line 1",
+                "  parse line 2",
+                "  parse line 3",
+                "  parse line 4",
+                "  parse line 5",
+            ],
+        )
+        self.assertNotIn("parse line 6", out)
 
     def test_python_parse_message_is_capped_at_five_lines(self):
         """source: a Python syntax error is one plain line, still within the five-line cap, and the parse step writes no file beside the guard."""
