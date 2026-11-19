@@ -1,0 +1,3 @@
+color=blue
+SECRET=not-a-real-secret
+count=4

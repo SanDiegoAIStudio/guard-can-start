@@ -1,0 +1,3 @@
+# Two ways to ask the sample guard to refuse a known-bad file.
+--good fixtures/good.txt no-secrets.sh fixtures/bad.txt
+--stdin --good fixtures/good.txt no-secrets.sh fixtures/bad.txt
